@@ -18,7 +18,7 @@ export default function Navbar() {
   return (
     <header className="bg-blue-500 p-4 flex items-center">
       <Link href="/">
-        <a className="text-white font-bold text-lg">Jello</a>
+        <button className="text-white font-bold text-lg">Jello</button>
       </Link>
       {user && (
         <div className="ml-auto">
