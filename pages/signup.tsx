@@ -1,4 +1,4 @@
-import { signInWithGoogle } from '../../src/firebaseConfig';
+import { signInWithGoogle } from '../src/firebaseConfig';
 import Link from 'next/link';
 
 export default function SignUp() {
