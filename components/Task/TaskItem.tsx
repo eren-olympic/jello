@@ -31,8 +31,10 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggleComplete }) => {
         onChange={handleToggleComplete}
       />
       <div className="flex-grow">
-        <h3 className="font-semibold">{task.title}</h3>
-        <p>{task.description}</p>
+        <h3 className="font-semibold inline-block mr-2">{task.title}</h3>
+        <span className="bg-blue-500 text-white text-xs py-1 px-2 rounded inline-block">
+          {task.category}
+        </span>
       </div>
       <span className="text-gray-500">{task.xp} XP</span>
     </div>
