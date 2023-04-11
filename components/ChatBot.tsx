@@ -45,7 +45,8 @@ const ChatBot = () => {
   const [userInput, setUserInput] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (event: React.FormEvent) => {
+    event.preventDefault();
     setMessages([...messages, `User: ${userInput}`]);
   
     try {
@@ -69,20 +70,17 @@ const ChatBot = () => {
           </p>
         ))}
       </div>
-      <div className="chatbot-input flex">
+      <form onSubmit={handleSendMessage} className="flex">
         <input
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          className="flex-grow border border-gray-300 rounded-md p-2 mr-4"
+          className="flex-grow mr-4 p-2 border border-gray-300 rounded"
         />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 text-white py-2 px-4 rounded-md"
-        >
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
           Send
         </button>
-      </div>
+      </form>
     </div>
   );
 };
