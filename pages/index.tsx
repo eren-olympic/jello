@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import Layout from '@/components/layout';
 import DailyTask from '../components/Task/DailyTask';
 import WeeklyTask from '../components/Task/WeeklyTask';
 import { Task } from '../components/Task/TaskItem';
@@ -31,6 +30,35 @@ const weeklyTasks: Task[] = [
   { id: 16, title: 'Analyze a specific stock or sector', category: 'Stock Market Analysis', description: null , xp: 20, isCompleted: false, finishedDate: null },
   { id: 17, title: 'Conduct basic technical analysis on a stock chart', category: 'Stock Market Analysis', description: null , xp: 15, isCompleted: false, finishedDate: null }
 ];
+
+const useFilteredAndSortedTasks = (tasks: Task[], filter: string, sort: string) => {
+  const [filteredAndSortedTasks, setFilteredAndSortedTasks] = useState(tasks);
+
+  useEffect(() => {
+    let filteredTasks = tasks.filter((task) =>
+      filter ? task.category.toLowerCase() === filter : true
+    );
+
+    filteredTasks.sort((a: Task, b: Task) => {
+      switch (sort) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'category':
+          return a.category.localeCompare(b.category);
+        case 'xp':
+          return a.xp - b.xp;
+        case 'finished_date':
+          return (a.finishedDate?.getTime() ?? 0) - (b.finishedDate?.getTime() ?? 0);
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredAndSortedTasks(filteredTasks);
+  }, [tasks, filter, sort]);
+
+  return filteredAndSortedTasks;
+};
 
 export default function Home() {
   const [tasks, setTasks] = useState([...dailyTasks, ...weeklyTasks]);
@@ -65,41 +93,18 @@ export default function Home() {
     );
   };
 
-  const [filteredDailyTasks, setFilteredDailyTasks] = useState(dailyTasks);
-  const [filteredWeeklyTasks, setFilteredWeeklyTasks] = useState(weeklyTasks);
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('');
+
+  const dailyTasksFilteredAndSorted = useFilteredAndSortedTasks(dailyTasks, filter, sort);
+  const weeklyTasksFilteredAndSorted = useFilteredAndSortedTasks(weeklyTasks, filter, sort);
 
   const handleFilterChange = (filter: string) => {
-    setFilteredDailyTasks(
-      dailyTasks.filter((task) =>
-        filter ? task.category.toLowerCase() === filter : true
-      )
-    );
-
-    setFilteredWeeklyTasks(
-      weeklyTasks.filter((task) =>
-        filter ? task.category.toLowerCase() === filter : true
-      )
-    );
+    setFilter(filter);
   };
 
   const handleSortChange = (sortValue: string) => {
-    const sortFunction = (a: Task, b: Task) => {
-      switch (sortValue) {
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'category':
-          return a.category.localeCompare(b.category);
-        case 'xp':
-          return a.xp - b.xp;
-        case 'finished_date':
-          return (a.finishedDate?.getTime() ?? 0) - (b.finishedDate?.getTime() ?? 0);
-        default:
-          return 0;
-      }
-    };
-
-    setFilteredDailyTasks([...dailyTasks].sort(sortFunction));
-    setFilteredWeeklyTasks([...weeklyTasks].sort(sortFunction));
+    setSort(sortValue);
   };
 
   const [activeTab, setActiveTab] = useState('daily');
@@ -120,10 +125,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-grow p-4">
+      <Layout>
           <h1 className="text-2xl font-semibold mb-6">Task Management</h1>
           <div className="bg-white p-6 rounded shadow-md">
             <div className="flex justify-between mb-4">
@@ -155,15 +157,14 @@ export default function Home() {
               exit="exit"
             >
               {activeTab === 'daily' && (
-                <DailyTask tasks={filteredDailyTasks} onToggleComplete={handleToggleComplete} />
-              )}
-              {activeTab === 'weekly' && (
-                <WeeklyTask tasks={filteredWeeklyTasks} onToggleComplete={handleToggleComplete} />
-              )}
+              <DailyTask tasks={dailyTasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
+            )}
+            {activeTab === 'weekly' && (
+              <WeeklyTask tasks={weeklyTasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
+            )}
             </motion.div>
           </div>
-        </main>
-      </div>
+      </ Layout>
     </div>
   );
 }
