@@ -7,6 +7,7 @@ import { Task } from '../components/Task/TaskItem';
 import AddTaskButton from '../components/Task/AddTaskButton';
 import TaskFilter from '../components/Task/TaskFilter';
 import TaskSort from '../components/Task/TaskSort';
+import { motion } from 'framer-motion';
 
 const dailyTasks: Task[] = [
   { id: 1, title: 'Reading Twitter feeds and writing 10 small notes', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
@@ -101,7 +102,21 @@ export default function Home() {
     setFilteredWeeklyTasks([...weeklyTasks].sort(sortFunction));
   };
 
-  const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
+  const [activeTab, setActiveTab] = useState('daily');
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.5 },
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -132,18 +147,23 @@ export default function Home() {
                 Weekly Tasks
               </button>
             </div>
-            {activeTab === 'daily' && (
-              <DailyTask tasks={filteredDailyTasks} onToggleComplete={handleToggleComplete} />
-            )}
-            {activeTab === 'weekly' && (
-              <WeeklyTask tasks={filteredWeeklyTasks} onToggleComplete={handleToggleComplete} />
-            )}
+            <motion.div
+              key={activeTab}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {activeTab === 'daily' && (
+                <DailyTask tasks={filteredDailyTasks} onToggleComplete={handleToggleComplete} />
+              )}
+              {activeTab === 'weekly' && (
+                <WeeklyTask tasks={filteredWeeklyTasks} onToggleComplete={handleToggleComplete} />
+              )}
+            </motion.div>
           </div>
         </main>
       </div>
     </div>
   );
 }
-
-
-
