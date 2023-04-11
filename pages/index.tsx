@@ -7,6 +7,7 @@ import AddTaskButton from '../components/Task/AddTaskButton';
 import TaskFilter from '../components/Task/TaskFilter';
 import TaskSort from '../components/Task/TaskSort';
 import { motion } from 'framer-motion';
+import ChatBot from '../components/ChatBot';
 
 const dailyTasks: Task[] = [
   { id: 1, title: 'Reading Twitter feeds and writing 10 small notes', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
@@ -163,6 +164,7 @@ export default function Home() {
               <WeeklyTask tasks={weeklyTasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
             )}
             </motion.div>
+            <ChatBot />
           </div>
       </ Layout>
     </div>
