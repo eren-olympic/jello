@@ -11,6 +11,8 @@ const getChatCompletion = async (input: string) => {
 };
 
 const ChatBot = () => {
+    const [systemMessage, setSystemMessage] = useState('You are a helpful assistant.');
+
     const callOpenAI = async (input: string) => {
         const response = await fetch('/api/openai/getChatCompletion', {
         method: 'POST',
@@ -21,7 +23,7 @@ const ChatBot = () => {
             messages: [
             {
                 role: 'system',
-                content: 'You are a helpful assistant.',
+                content: systemMessage,
             },
             {
                 role: 'user',
@@ -63,6 +65,18 @@ const ChatBot = () => {
 
   return (
     <div className="chatbot">
+      <div className="mb-4">
+        <label htmlFor="system-message" className="block mb-1">
+          Bot Role:
+        </label>
+        <input
+          id="system-message"
+          type="text"
+          value={systemMessage}
+          onChange={(e) => setSystemMessage(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
       <div className="chatbot-messages p-4 border border-gray-300 rounded-md mb-4 h-60 overflow-y-scroll">
         {messages.map((message, index) => (
           <p key={index} className="mb-2">
