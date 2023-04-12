@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout';
-import DailyTask from '../components/Task/DailyTask';
-import WeeklyTask from '../components/Task/WeeklyTask';
+import TaskList from '../components/Task/TaskList';
 import { Task } from '../components/Task/TaskItem';
 import AddTaskButton from '../components/Task/AddTaskButton';
 import TaskFilter from '../components/Task/TaskFilter';
@@ -9,35 +8,22 @@ import TaskSort from '../components/Task/TaskSort';
 import { motion } from 'framer-motion';
 import ChatBot from '../components/ChatBot';
 
-const dailyTasks: Task[] = [
-  { id: 1, title: 'Reading Twitter feeds and writing 10 small notes', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 2, title: 'Reading news and writing 3 medium notes', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 3, title: 'Set and review daily priorities', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 4, title: 'Network with one industry professional', category: 'General', description: null , xp: 15, isCompleted: false, finishedDate: null },
-  { id: 5, title: 'Listen to a relevant podcast episode and take notes', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 6, title: 'Share an interesting industry-related article with your team', category: 'General', description: null , xp: 15, isCompleted: false, finishedDate: null },
-  { id: 7, title: 'Learn and implement a new keyboard shortcut or productivity hack', category: 'Tools', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 8, title: 'Share a useful resource or tool with team members', category: 'Tools', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 9, title: 'Define new feature requirements', category: 'PM', description: null , xp: 20, isCompleted: false, finishedDate: null }
+const initialTasks: Task[] = [
+  { id: 1, title: 'Reading Twitter feeds and writing 10 small notes', type: 'daily', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
+  { id: 2, title: 'Write the Taost Phase II RPD', type: 'one-time', category: 'General', description: null , xp: 10, isCompleted: false, finishedDate: null },
+  { id: 10, title: 'Ensure all project documentation is up-to-date', type: 'weekly', category: 'PM', description: null , xp: 20, isCompleted: false, finishedDate: null }
 ];
 
-const weeklyTasks: Task[] = [
-  { id: 10, title: 'Ensure all project documentation is up-to-date', category: 'PM', description: null , xp: 20, isCompleted: false, finishedDate: null },
-  { id: 11, title: 'Design a page/component using Figma, referencing inspiration from Dribbble', category: 'Designer', description: null , xp: 30, isCompleted: false, finishedDate: null },
-  { id: 12, title: 'Brainstorm new design ideas or concepts', category: 'Designer', description: null , xp: 20, isCompleted: false, finishedDate: null },
-  { id: 13, title: 'Evaluate and improve the accessibility of a design', category: 'Designer', description: null , xp: 20, isCompleted: false, finishedDate: null },
-  { id: 14, title: 'Monitor stock market news and trends', category: 'Stock Market Analysis', description: null , xp: 15, isCompleted: false, finishedDate: null },
-  { id: 15, title: 'Review performance of your investment portfolio', category: 'Stock Market Analysis', description: null , xp: 10, isCompleted: false, finishedDate: null },
-  { id: 16, title: 'Analyze a specific stock or sector', category: 'Stock Market Analysis', description: null , xp: 20, isCompleted: false, finishedDate: null },
-  { id: 17, title: 'Conduct basic technical analysis on a stock chart', category: 'Stock Market Analysis', description: null , xp: 15, isCompleted: false, finishedDate: null }
-];
-
-const useFilteredAndSortedTasks = (tasks: Task[], filter: string, sort: string) => {
+const useFilteredAndSortedTasks = (tasks: Task[], filter: string, sort: string, typeFilter: string) => {
   const [filteredAndSortedTasks, setFilteredAndSortedTasks] = useState(tasks);
 
   useEffect(() => {
     let filteredTasks = tasks.filter((task) =>
       filter ? task.category.toLowerCase() === filter : true
+    );
+
+    filteredTasks = filteredTasks.filter((task) =>
+      typeFilter === 'all' ? true : task.type === typeFilter
     );
 
     filteredTasks.sort((a: Task, b: Task) => {
@@ -56,16 +42,17 @@ const useFilteredAndSortedTasks = (tasks: Task[], filter: string, sort: string) 
     });
 
     setFilteredAndSortedTasks(filteredTasks);
-  }, [tasks, filter, sort]);
+  }, [tasks, filter, sort, typeFilter]);
 
   return filteredAndSortedTasks;
 };
 
 export default function Home() {
-  const [tasks, setTasks] = useState([...dailyTasks, ...weeklyTasks]);
+  const [tasks, setTasks] = useState(initialTasks);
   const [newTask, setNewTask] = useState<Task>({
     id: tasks.length + 1,
     title: '',
+    type: 'one-time',
     category: '',
     description: '',
     xp: 0,
@@ -97,18 +84,26 @@ export default function Home() {
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
 
-  const dailyTasksFilteredAndSorted = useFilteredAndSortedTasks(dailyTasks, filter, sort);
-  const weeklyTasksFilteredAndSorted = useFilteredAndSortedTasks(weeklyTasks, filter, sort);
+  const [activeTypeFilter, setActiveTypeFilter] = useState('all');
+  const tasksFilteredAndSorted = useFilteredAndSortedTasks(tasks, filter, sort, activeTypeFilter);
 
   const handleFilterChange = (filter: string) => {
-    setFilter(filter);
+    if (filter === 'all') {
+      setFilter('');
+    } else {
+      setFilter(filter);
+    }
   };
 
   const handleSortChange = (sortValue: string) => {
     setSort(sortValue);
   };
 
-  const [activeTab, setActiveTab] = useState('daily');
+  const [activeTab, setActiveTab] = useState('all');
+
+  const handleTypeFilterClick = (typeFilter: string) => {
+    setActiveTypeFilter(typeFilter);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -137,18 +132,18 @@ export default function Home() {
               </div>
             </div>
             <div className="mb-4">
-              <button
-                className={`mr-4 py-2 px-4 rounded ${activeTab === 'daily' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-                onClick={() => setActiveTab('daily')}
-              >
-                Daily Tasks
-              </button>
-              <button
-                className={`py-2 px-4 rounded ${activeTab === 'weekly' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-                onClick={() => setActiveTab('weekly')}
-              >
-                Weekly Tasks
-              </button>
+              {['all', 'daily', 'weekly', 'one-time', 'urgent'].map((tab) => (
+                <button
+                  key={tab}
+                  className={`mr-4 py-2 px-4 rounded ${activeTab === tab ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    handleTypeFilterClick(tab);
+                  }}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Tasks
+                </button>
+              ))}
             </div>
             <motion.div
               key={activeTab}
@@ -157,16 +152,12 @@ export default function Home() {
               animate="visible"
               exit="exit"
             >
-              {activeTab === 'daily' && (
-              <DailyTask tasks={dailyTasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
-            )}
-            {activeTab === 'weekly' && (
-              <WeeklyTask tasks={weeklyTasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
-            )}
+              <TaskList title={`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Tasks`} tasks={tasksFilteredAndSorted} onToggleComplete={handleToggleComplete} />
             </motion.div>
             <ChatBot />
           </div>
-      </ Layout>
+      </Layout>
     </div>
   );
 }
+

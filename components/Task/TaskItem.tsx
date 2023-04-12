@@ -5,6 +5,7 @@ import React from 'react';
 export interface Task {
   id: number;
   title: string;
+  type: 'daily' | 'weekly' | 'one-time' | 'urgent';
   category: string;
   description: string | null;
   xp: number;
